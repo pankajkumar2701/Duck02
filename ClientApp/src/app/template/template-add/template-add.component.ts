@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Observable, Subject, forkJoin, takeUntil } from 'rxjs';
 import { EntityDataService } from 'src/app/angular-app-services/entity-data.service';
@@ -19,7 +19,7 @@ export class TemplateAddComponent implements OnInit {
   @Output() saved = new EventEmitter<boolean>();
 
   fieldOptions: { [key: string]: Option[]; } = {};
-  form!: FormGroup;
+  form?: FormGroup;
   layoutData: any[] = [];
 
   private destroy = new Subject();
@@ -46,7 +46,7 @@ export class TemplateAddComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const data = this.form.value;
+    const data = this.form?.value;
     if (this.id) {
       data.id = this.id;
     }
@@ -98,7 +98,7 @@ export class TemplateAddComponent implements OnInit {
           });
         }
       });
-    this.form.patchValue(data);
+    this.form?.patchValue(data);
   }
 
   private getRecord(id: string): void {
@@ -120,7 +120,15 @@ export class TemplateAddComponent implements OnInit {
         this.initializeForm(field.fields);
       } else {
         field.fieldName = _camelCase(field.fieldName);
-        this.form.addControl(field.fieldName, new FormControl(''));
+        const validators: any[] = [];
+        if (
+          (typeof field.required === 'boolean' && field.required) ||
+          (typeof field.required === 'string' && field.required.toLowerCase() === 'true')
+        ) {
+          validators.push(Validators.required);
+        }
+
+        this.form?.addControl(field.fieldName, new FormControl('', validators));
         if (field.dataType === 'guid') {
           this.fieldOptions[field.fieldName] = [];
         }

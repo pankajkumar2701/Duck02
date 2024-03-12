@@ -5,7 +5,7 @@
                 <ng-container [ngSwitch]="field.type">
                     <!-- Section -->
                     <div *ngSwitchCase="'section'" class="section">
-                        <h4>{{field.name}}</h4>
+                        <h4><i *ngIf="field.icon" class="fas {{field.icon}} mr10"></i>{{field.name}}</h4>
                         <app-dynamic-layout [form]="form" [formFields]="field.fields"
                             [fieldOptions]="fieldOptions"></app-dynamic-layout>
                     </div>
@@ -40,7 +40,7 @@
                             </mat-form-field>
 
                             <!-- Radio -->
-                            <div *ngSwitchCase="'radio'" class="form-group row-item-half">
+                            <div *ngSwitchCase="'boolean'" class="form-group row-item-half">
                                 <p>{{field.label}}</p>
                                 <mat-radio-group name="field.fieldName" [formControlName]="field.fieldName"
                                     [attr.required]="field.required">

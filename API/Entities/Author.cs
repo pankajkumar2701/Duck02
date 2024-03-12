@@ -54,11 +54,11 @@ namespace Duck02.Entities
         /// Required field TravelDate of the Author 
         /// </summary>
         [Required]
-        public Date TravelDate { get; set; }
+        public DateTime TravelDate { get; set; }
         /// <summary>
         /// ReturnDate of the Author 
         /// </summary>
-        public Date? ReturnDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
         /// <summary>
         /// Collection navigation property representing associated 
         /// </summary>

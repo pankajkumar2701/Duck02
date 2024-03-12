@@ -19,6 +19,27 @@ export class TemplateListComponent implements OnInit, OnChanges, OnDestroy {
   @Output() previewRecord = new EventEmitter<number>();
 
   sentenceCaseEntityName: string = '';
+  searchText: string = '';
+  showFilterPanel: boolean = false;
+  public authors: Array<{ text: string; value: number; }> = [
+    { text: "Chetan Bhagat", value: 1 },
+    { text: "Jhumpa Lahiri", value: 2 },
+    { text: "Arundhati Roy", value: 3 },
+    { text: "Salman Rushdie", value: 4 },
+  ];
+
+  public genre: Array<{ text: string; value: number; }> = [
+    { text: "Fiction", value: 1 },
+    { text: "Historical Fiction", value: 2 },
+    { text: "Science fiction", value: 3 },
+    { text: "Horror", value: 4 },
+  ];
+
+  public publication: Array<{ text: string; value: number; }> = [
+    { text: "PKT publication", value: 1 },
+    { text: "Ananda publishers", value: 2 },
+    { text: "Deb publication", value: 3 }
+  ];
 
   private destroy = new Subject();
 
@@ -100,4 +121,13 @@ export class TemplateListComponent implements OnInit, OnChanges, OnDestroy {
       }
       );
   }
+
+  openFilterPanel() {
+    this.showFilterPanel = true;
+  }
+
+  clearFilter() {
+    this.showFilterPanel = false;
+  }
+
 }

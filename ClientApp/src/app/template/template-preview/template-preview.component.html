@@ -22,12 +22,16 @@
             <div class="preview-tem-dtl-base col-xl-4 col-lg-6 col-md-12 col-sm-12">
                 <div class="cards">
                     <div class="d-flex align-items-center card-title">
-                        <p class="font-title-medium tuncate-text">{{section.name}}</p>
+                        <p class="font-title-medium tuncate-text">
+                            <i *ngIf="section.icon" class="fas {{section.icon}} mr10"></i>{{section.name}}
+                        </p>
                     </div>
                     <div class="row">
                         <div class="col-6" *ngFor="let field of section.fields">
-                            <p class="font-body-medium color-font-primary">{{field.label}}</p>
-                            <p class="font-title-xs fw-normal color-font-secondary">{{field.value}}</p>
+                            <p *ngIf="!field.icon" class="font-body-medium color-font-primary">{{field.label}}</p>
+                            <p class="font-title-xs fw-normal color-font-secondary">
+                                <i *ngIf="field.icon" class="fas {{field.icon}} mr10"></i>{{field.value}}
+                            </p>
                         </div>
                     </div>
                 </div>

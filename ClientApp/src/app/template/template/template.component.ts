@@ -143,10 +143,12 @@ export class TemplateComponent implements OnInit {
         return {
           id: record.id,
           name: node.name,
+          icon: node.icon,
           type: node.type,
           fields: node.fields.map((field: any) => {
             return {
               label: field.label,
+              icon: field.icon,
               value: this.getFormattedData(record, field)
             };
           })
@@ -173,6 +175,7 @@ export class TemplateComponent implements OnInit {
             (detail: any) => {
               return {
                 label: detail.label,
+                icon: detail.icon,
                 value: this.getFormattedData(record, detail)
               };
             }) || [],
@@ -180,6 +183,7 @@ export class TemplateComponent implements OnInit {
             (status: any) => {
               return {
                 label: status.label,
+                icon: status.icon,
                 value: this.getFormattedData(record, status)
               };
             }) || [];
