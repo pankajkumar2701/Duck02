@@ -15,7 +15,7 @@ namespace Duck02.Entities
         /// </summary>
         public Author()
         {
-            UpdatedOn = "2020-03-31T00:00:00.000Z";
+            UpdatedOn = "2020-03-31 05:30:00";
             TravelDate = "2020-10-30";
         }
 
