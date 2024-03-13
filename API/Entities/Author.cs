@@ -42,14 +42,23 @@ namespace Duck02.Entities
         public Guid? UpdatedBy { get; set; }
 
         /// <summary>
-        /// Required field TravelDate of the Author 
+        /// Required field PaymentDate of the Author 
         /// </summary>
         [Required]
-        public DateTime TravelDate { get; set; }
+        [Column(TypeName = "date")]
+        public DateTime PaymentDate { get; set; }
+
         /// <summary>
-        /// ReturnDate of the Author 
+        /// DOBDate of the Author 
         /// </summary>
-        public DateTime? ReturnDate { get; set; }
+        [Column(TypeName = "date")]
+        public DateTime? DOBDate { get; set; }
+
+        /// <summary>
+        /// DueDate of the Author 
+        /// </summary>
+        [Column(TypeName = "date")]
+        public DateTime? DueDate { get; set; }
         /// <summary>
         /// Collection navigation property representing associated 
         /// </summary>
