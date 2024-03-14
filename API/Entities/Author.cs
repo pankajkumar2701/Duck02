@@ -11,6 +11,16 @@ namespace Duck02.Entities
     public class Author
     {
         /// <summary>
+        /// Initializes a new instance of the Author class.
+        /// </summary>
+        public Author()
+        {
+            CreatedOn = "2001-01-27 20:30";
+            UpdatedOn = "2000-01-27T20:30:10.000Z";
+            PaymentDate = "2001-01-27";
+        }
+
+        /// <summary>
         /// Primary key for the Author 
         /// </summary>
         [Key]
