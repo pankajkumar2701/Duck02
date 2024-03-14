@@ -5,6 +5,8 @@ import { EntityDataService } from 'src/app/angular-app-services/entity-data.serv
 import { Subject, takeUntil } from 'rxjs';
 import { SweetAlertService } from 'src/app/angular-app-services/sweet-alert.service';
 import { _toSentenceCase } from 'src/app/library/utils';
+import { Option } from '../dynamic-layout/layout-models';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-template-list',
@@ -13,33 +15,19 @@ import { _toSentenceCase } from 'src/app/library/utils';
 })
 export class TemplateListComponent implements OnInit, OnChanges, OnDestroy {
   @Input() entityName: string = '';
+  @Input() form?: FormGroup;
+  @Input() fieldOptions: { [key: string]: Option[]; } = {};
+  @Input() filterFields: any[] = [];
   @Input() mappedData: any[] = [];
   @Input() selectedIndex: number | null = 0;
   @Output() refresh = new EventEmitter<void>();
+  @Output() filter = new EventEmitter<any[]>();
   @Output() previewRecord = new EventEmitter<number>();
 
-  sentenceCaseEntityName: string = '';
   searchText: string = '';
+  sentenceCaseEntityName: string = '';
   showFilterPanel: boolean = false;
-  public authors: Array<{ text: string; value: number; }> = [
-    { text: "Chetan Bhagat", value: 1 },
-    { text: "Jhumpa Lahiri", value: 2 },
-    { text: "Arundhati Roy", value: 3 },
-    { text: "Salman Rushdie", value: 4 },
-  ];
-
-  public genre: Array<{ text: string; value: number; }> = [
-    { text: "Fiction", value: 1 },
-    { text: "Historical Fiction", value: 2 },
-    { text: "Science fiction", value: 3 },
-    { text: "Horror", value: 4 },
-  ];
-
-  public publication: Array<{ text: string; value: number; }> = [
-    { text: "PKT publication", value: 1 },
-    { text: "Ananda publishers", value: 2 },
-    { text: "Deb publication", value: 3 }
-  ];
+  filterData: any[] = [];
 
   private destroy = new Subject();
 
@@ -99,12 +87,31 @@ export class TemplateListComponent implements OnInit, OnChanges, OnDestroy {
       });
   }
 
+  clearSpecificFilter(key: string): void {
+    this.form?.get(key)?.setValue(null);
+    this.form?.get(key)?.updateValueAndValidity();
+    this.filterData = this.filterData.filter(x => x.key !== key);
+    this.onSearch();
+  }
+
   async confirmDelete(id: string): Promise<void> {
     const confirmed = await this.sweetAlertService.showDeleteConfirmationDialog();
 
     if (confirmed) {
       this.deleteData(id);
     }
+  }
+
+  onSearch(): void {
+    const filter = [];
+    for (const [key, value] of Object.entries(this.form?.value)) {
+      if (value) {
+        filter.push({ PropertyName: key, Operator: 'equals', Value: value });
+        this.filterData.push({ key: key, value: value as string });
+      }
+    }
+    this.filter.emit(filter);
+    this.showFilterPanel = false;
   }
 
   previewSpecificRecord(index: number): void {
@@ -115,19 +122,11 @@ export class TemplateListComponent implements OnInit, OnChanges, OnDestroy {
   private deleteData(id: string): void {
     this.entityDataService.deleteRecordById(this.entityName, id)
       .pipe(takeUntil(this.destroy))
-      .subscribe(() => {
-        this.sweetAlertService.showSuccess(_toSentenceCase(this.entityName) + ' has been deleted.');
-        this.refresh.emit();
-      }
-      );
+      .subscribe({
+        next: () => {
+          this.sweetAlertService.showSuccess(_toSentenceCase(this.entityName) + ' has been deleted.');
+          this.refresh.emit();
+        }
+      });
   }
-
-  openFilterPanel() {
-    this.showFilterPanel = true;
-  }
-
-  clearFilter() {
-    this.showFilterPanel = false;
-  }
-
 }

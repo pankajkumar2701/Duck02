@@ -7,7 +7,6 @@ import { AuthService } from '../angular-app-services/auth.service';
 import { TokenService } from '../angular-app-services/token.service';
 import { AppConfigService } from '../app-config.service';
 import { SweetAlertService } from '../angular-app-services/sweet-alert.service';
-import { LoaderService } from '../angular-app-services/loader.service';
 
 
 @Component({
@@ -27,8 +26,7 @@ export class LoginComponent implements OnInit {
     private authService: AuthService,
     private route: ActivatedRoute,
     private tokenService: TokenService,
-    private sweetAlertService: SweetAlertService,
-    protected loaderService: LoaderService
+    private sweetAlertService: SweetAlertService
   ) {
     if (!this.tokenService.isAuthTokenExpired()) {
       this.navigateTo();

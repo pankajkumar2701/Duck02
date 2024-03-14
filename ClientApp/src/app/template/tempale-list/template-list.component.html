@@ -1,7 +1,7 @@
-<div class="main-left-list-sec patient-list-sec">
+<div class="main-left-list-sec">
     <div class="list-sec-top-bar d-flex justify-content-between">
         <h1 class="font-section-title-medium">{{sentenceCaseEntityName}}</h1>
-        <button mat-button class="ec-primary-btn add-invoice-btn" (click)='addRecord()'>
+        <button mat-button class="ec-primary-btn add-list-btn" (click)='addRecord()'>
             <span class="material-icons icon-btn">add</span>Add {{entityName}}
         </button>
     </div>
@@ -13,57 +13,68 @@
             <div class="search-input">
                 <input type="text" placeholder="Search...">
             </div>
-            <div class="filter-icon" (click)="openFilterPanel()">
+            <div class="filter-icon" (click)="showFilterPanel = !showFilterPanel">
                 <img src="assets/images/icons/filter.svg" width="20" height="20" alt="filter">
             </div>
             <div class="filter-panel" *ngIf="showFilterPanel">
-                <div class="filter-data">
-                    <div class="filter-data-item">
-                        <p class="filter-text">Chetan Bhagat</p>
-                        <a><mat-icon aria-label="Delete">close</mat-icon></a>
-                    </div>
-                    <div class="filter-data-item">
-                        <p class="filter-text">Fiction</p>
-                        <a><mat-icon aria-label="Delete">close</mat-icon></a>
+                <div class="filter-data" *ngIf="filterData?.length">
+                    <div class="filter-data-item" *ngFor="let data of filterData">
+                        <p class="filter-text">{{data.value}}</p>
+                        <a (click)="clearSpecificFilter(data.key)"><mat-icon aria-label="Delete">close</mat-icon></a>
                     </div>
                 </div>
-                <div class="">
-                    <div class="form-group row-item-full">
-                        <mat-form-field class="input-form-field" appearance="fill">
-                            <mat-label>Author</mat-label>
-                            <mat-select>
-                                <mat-option *ngFor="let item of authors" [value]="item">
-                                    {{item.text}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                    <div class="form-group row-item-full">
-                        <mat-form-field class="input-form-field" appearance="fill">
-                            <mat-label>Genre</mat-label>
-                            <mat-select>
-                                <mat-option *ngFor="let item of genre" [value]="item">
-                                    {{item.text}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
-                    <div class="form-group row-item-full">
-                        <mat-form-field class="input-form-field" appearance="fill">
-                            <mat-label>Publication</mat-label>
-                            <mat-select>
-                                <mat-option *ngFor="let item of publication" [value]="item">
-                                    {{item.text}}
-                                </mat-option>
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
+                <div>
+                    <form *ngIf="form && filterFields" [formGroup]="form" autocomplete="off">
+                        <div class="form-group row-item-full" *ngFor="let field of filterFields">
+                            <mat-form-field class="input-form-field" appearance="fill">
+                                <mat-label *ngIf="field.dataType.toLowerCase()!=='boolean'">{{field.label}}</mat-label>
+                                <ng-container [ngSwitch]="field.dataType.toLowerCase()">
+                                    <ng-container *ngSwitchDefault>
+                                        <input matInput [formControlName]="field.fieldName">
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'numeric'">
+                                        <input type="number" matInput [formControlName]="field.fieldName">
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'guid'">
+                                        <mat-select [formControlName]="field.fieldName">
+                                            <mat-option [value]="null">Select</mat-option>
+                                            <mat-option *ngFor="let option of fieldOptions[field.fieldName]"
+                                                [value]="option.value">
+                                                {{option.text}}
+                                            </mat-option>
+                                        </mat-select>
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'datetime'">
+                                        <input matInput [formControlName]="field.fieldName" [matDatepicker]="picker">
+                                        <mat-hint>MM/DD/YYYY</mat-hint>
+                                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                                        <mat-datepicker #picker></mat-datepicker>
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'boolean'">
+                                        <mat-checkbox class="mat-check-box-field"
+                                            [formControlName]="field.fieldName">{{field.label}}</mat-checkbox>
+                                    </ng-container>
+
+                                    <ng-container *ngSwitchCase="'radio'">
+                                        <mat-radio-group name="field.fieldName" [formControlName]="field.fieldName">
+                                            <mat-radio-button *ngFor="let option of fieldOptions[field.fieldName]"
+                                                [value]="option.value">{{ option.text }}</mat-radio-button>
+                                        </mat-radio-group>
+                                    </ng-container>
+                                </ng-container>
+                            </mat-form-field>
+                        </div>
+                    </form>
                     <div class="filter-bottom">
                         <div class="btn-wrapper">
-                            <button mat-button class="ec-primary-btn">Search</button>
-                            <button mat-button class="ec-cancel-btn" (click)="clearFilter()">Cancel</button>
+                            <button mat-button class="ec-primary-btn" (click)="onSearch()">Search</button>
+                            <button mat-button class="ec-cancel-btn" (click)="showFilterPanel=false">Cancel</button>
                         </div>
-                        <span class="search-results ec-badge-green">8 results</span>
+                        <!-- <span class="search-results ec-badge-green">8 results</span> -->
                     </div>
                 </div>
 

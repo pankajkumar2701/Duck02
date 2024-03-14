@@ -15,8 +15,11 @@ export class EntityDataService {
         return this.http.post<any>(`${this.baseUrl}/${entityName}`, data);
     }
 
-    getRecord(entityName: string): Observable<any[]> {
-        return this.http.get<any[]>(`${this.baseUrl}/${entityName}`);
+    getRecord(entityName: string, filters: any[] = []): Observable<any[]> {
+        if (filters?.length > 0)
+            return this.http.get<any[]>(`${this.baseUrl}/${entityName}`, { params: { filters: JSON.stringify(filters) } });
+        else
+            return this.http.get<any[]>(`${this.baseUrl}/${entityName}`);
     }
 
     getRecordById(entityName: string, id: string): Observable<any> {

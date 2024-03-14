@@ -17,21 +17,23 @@
         </button>
     </div>
 
-    <div class="preview-tem-dtl-column-wrapper row">
+    <div class="preview-tem-dtl-column-wrapper main-section-right-wrapper row">
         <ng-container *ngFor="let section of mappedData; let i=index">
-            <div class="preview-tem-dtl-base col-xl-4 col-lg-6 col-md-12 col-sm-12">
+            <div class="preview-tem-dtl-base col-sm-12">
                 <div class="cards">
                     <div class="d-flex align-items-center card-title">
-                        <p class="font-title-medium tuncate-text">
+                        <p class="section-header tuncate-text">
                             <i *ngIf="section.icon" class="fas {{section.icon}} mr10"></i>{{section.name}}
                         </p>
                     </div>
                     <div class="row">
-                        <div class="col-6" *ngFor="let field of section.fields">
-                            <p *ngIf="!field.icon" class="font-body-medium color-font-primary">{{field.label}}</p>
-                            <p class="font-title-xs fw-normal color-font-secondary">
-                                <i *ngIf="field.icon" class="fas {{field.icon}} mr10"></i>{{field.value}}
-                            </p>
+                        <div class="col-xl-3 col-lg-6 col-md-12 col-sm-12" *ngFor="let field of section.fields">
+                            <div class="preview-data">
+                                <p *ngIf="!field.icon" class="font-body-medium color-font-preview">{{field.label}}</p>
+                                <p class="font-title-xs fw-normal color-font-preview">
+                                    <i *ngIf="field.icon" class="fas {{field.icon}} mr10"></i>{{field.value}}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -45,19 +45,14 @@ namespace Duck02.Entities
         /// Required field PaymentDate of the Author 
         /// </summary>
         [Required]
-        [Column(TypeName = "date")]
         public DateTime PaymentDate { get; set; }
-
         /// <summary>
-        /// DOBDate of the Author 
+        /// DobDate of the Author 
         /// </summary>
-        [Column(TypeName = "date")]
-        public DateTime? DOBDate { get; set; }
-
+        public DateTime? DobDate { get; set; }
         /// <summary>
         /// DueDate of the Author 
         /// </summary>
-        [Column(TypeName = "date")]
         public DateTime? DueDate { get; set; }
         /// <summary>
         /// Collection navigation property representing associated 

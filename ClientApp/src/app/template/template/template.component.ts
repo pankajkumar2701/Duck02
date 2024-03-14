@@ -4,6 +4,8 @@ import { Subject, forkJoin, takeUntil } from 'rxjs';
 import { EntityDataService } from 'src/app/angular-app-services/entity-data.service';
 import { LayoutService } from 'src/app/angular-app-services/layout.service';
 import { _camelCase } from 'src/app/library/utils';
+import { Option } from '../dynamic-layout/layout-models';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-template',
@@ -13,6 +15,9 @@ import { _camelCase } from 'src/app/library/utils';
 export class TemplateComponent implements OnInit {
   selectedId: string = '';
   entityName: string = '';
+  fieldOptions: { [key: string]: Option[]; } = {};
+  filterFields: any[] = [];
+  form?: FormGroup;
   mappedListData: any[] = [];
   mappedPreviewData: any[] = [];
   selectedIndex: number | null = null;
@@ -43,12 +48,12 @@ export class TemplateComponent implements OnInit {
     }
   }
 
-  onRefresh(): void {
+  onFilterChange(filters: any[] = []): void {
     this.records = [];
     this.mappedListData = [];
     this.mappedPreviewData = [];
 
-    this.entityDataService.getRecord(this.entityName)
+    this.entityDataService.getRecord(this.entityName, filters)
       .pipe(takeUntil(this.destroy))
       .subscribe({
         next: (records) => {
@@ -61,6 +66,10 @@ export class TemplateComponent implements OnInit {
           this.mapPreviewData(this.records?.[this.selectedIndex]);
         }
       });
+  }
+
+  onRefresh(): void {
+    this.onFilterChange();
   }
 
   private getEntityName(): void {
@@ -107,6 +116,8 @@ export class TemplateComponent implements OnInit {
           this.records = records;
           this.editLayout = editLayout;
           this.listLayout = listLayout;
+
+          this.prepareFilterFields();
 
           this.prepareMappedData();
 
@@ -161,6 +172,35 @@ export class TemplateComponent implements OnInit {
     }
   }
 
+  private prepareFilterFields(): void {
+    this.filterFields = [];
+    this.form = new FormGroup({});
+    if (this.listLayout) {
+      this.filterFields.push(...this.listLayout.cardTitle.fields);
+      this.filterFields.push(...this.listLayout.cardDetail.fields);
+      this.filterFields.push(...this.listLayout.cardStatus.fields);
+    }
+
+    this.filterFields.forEach(field => {
+      this.form?.addControl(field.fieldName, new FormControl(null));
+    });
+
+    const fields = this.filterFields.filter(o => o.dataType.toLowerCase() === 'guid').map(o => o.fieldName),
+      apis = fields.map(o => this.entityDataService.getRecord(o.replace('Id', '')));
+
+    if (!apis || apis.length === 0) return;
+
+    forkJoin(apis)
+      .pipe(takeUntil(this.destroy))
+      .subscribe({
+        next: data => {
+          fields.forEach((fieldName, index) => {
+            this.fieldOptions[fieldName] = data[index].map(item => { return { value: item.id, text: item.name }; });
+          });
+        }
+      });
+  }
+
   private prepareMappedData(): void {
     if (this.records?.length > 0 && this.listLayout) {
       this.mappedListData = this.records.map(record => {
@@ -203,6 +243,7 @@ export class TemplateComponent implements OnInit {
     this.records = [];
     this.editLayout = [];
     this.listLayout = undefined;
+    this.filterFields = [];
     this.mappedListData = [];
     this.mappedPreviewData = [];
   }

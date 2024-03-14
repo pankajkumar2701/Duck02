@@ -63,6 +63,20 @@ export class TemplateAddComponent implements OnInit {
       });
   }
 
+  private getDefaultValue(field: any): any {
+    switch (field.dataType.toLowerCase()) {
+      case 'numeric':
+      case 'guid':
+      case 'date':
+      case 'datetime':
+        return null;
+      case 'boolean':
+        return false;
+      default:
+        return '';
+    }
+  }
+
   private getLayout(entityName: string, layoutType: string): void {
     this.layoutService.getLayout(entityName, layoutType)
       .pipe(takeUntil(this.destroy))
@@ -87,6 +101,7 @@ export class TemplateAddComponent implements OnInit {
       fields.push(key);
       apis.push(this.entityDataService.getRecord(key.replace('Id', '')));
     });
+    this.form?.patchValue(data);
     if (!apis || apis.length === 0) return;
 
     forkJoin(apis)
@@ -98,7 +113,6 @@ export class TemplateAddComponent implements OnInit {
           });
         }
       });
-    this.form?.patchValue(data);
   }
 
   private getRecord(id: string): void {
@@ -120,7 +134,8 @@ export class TemplateAddComponent implements OnInit {
         this.initializeForm(field.fields);
       } else {
         field.fieldName = _camelCase(field.fieldName);
-        const validators: any[] = [];
+        const defaultValue = this.getDefaultValue(field),
+          validators: any[] = [];
         if (
           (typeof field.required === 'boolean' && field.required) ||
           (typeof field.required === 'string' && field.required.toLowerCase() === 'true')
@@ -128,8 +143,18 @@ export class TemplateAddComponent implements OnInit {
           validators.push(Validators.required);
         }
 
-        this.form?.addControl(field.fieldName, new FormControl('', validators));
-        if (field.dataType === 'guid') {
+        if (field.dataType.toLowerCase() === 'numeric') {
+          if (field.scale) {
+            const scale = parseInt(field.scale),
+              regEx = RegExp("^-?[0-9]+(\\.[0-9]{0," + scale + "}){0,1}$");
+            validators.push(Validators.pattern(regEx));
+          } else {
+            validators.push(Validators.pattern(/^-?\d+$/));
+          }
+        }
+
+        this.form?.addControl(field.fieldName, new FormControl(defaultValue, validators));
+        if (field.dataType.toLowerCase() === 'guid') {
           this.fieldOptions[field.fieldName] = [];
         }
       }
